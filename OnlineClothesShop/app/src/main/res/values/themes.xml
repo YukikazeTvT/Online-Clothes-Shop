@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.OnlineClothesShop" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="Theme.OnlineClothesShop" parent="Base.Theme.OnlineClothesShop" />
+    <style name="Theme.Splash" parent="Theme.AppCompat.NoActionBar">
+        <!-- Set the window background to black to match the splash screen -->
+        <item name="android:windowBackground">@android:color/black</item>
+        <!-- Disable the default window animation -->
+        <item name="android:windowAnimationStyle">@null</item>
+        <!-- Ensure no status bar or navigation bar background changes -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Optional: Make the splash screen fullscreen -->
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>
