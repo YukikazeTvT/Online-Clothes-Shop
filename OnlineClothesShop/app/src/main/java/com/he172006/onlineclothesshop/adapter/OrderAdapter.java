@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.he172006.onlineclothesshop.R;
@@ -40,10 +41,10 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.txtStatus.setText("Status: " + order.getStatus());
         holder.txtTotalAmount.setText("Total: $" + order.getTotalAmount());
 
-        // Khi nhấn vào nút Update, chuyển đến màn hình Update Order
+        // Khi nhấn vào nút Update, gọi callback để mở màn hình Update Order
         holder.btnUpdate.setOnClickListener(v -> listener.onUpdateOrder(order));
 
-        // Khi nhấn vào toàn bộ item, cũng có thể mở Update Order
+        // Khi nhấn vào toàn bộ item, cũng mở màn hình Update Order
         holder.itemView.setOnClickListener(v -> listener.onUpdateOrder(order));
     }
 
@@ -65,7 +66,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         }
     }
 
+    // Interface để xử lý sự kiện click vào đơn hàng
     public interface OnOrderClickListener {
         void onUpdateOrder(Order order);
     }
+
 }
