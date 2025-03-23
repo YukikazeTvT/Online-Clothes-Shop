@@ -58,6 +58,7 @@ public class ProductDAO {
                 values.put(COLUMN_PRODUCT_NAME, product.getProductName());
                 values.put(COLUMN_PRICE, product.getPrice());
                 values.put(COLUMN_IMAGE, product.getImage());
+                values.put(COLUMN_DESCRIPTION, product.getDescription());
                 values.put(COLUMN_STOCK, product.getStock());
                 values.put(COLUMN_CATEGORY_ID, product.getCategoryId());
 

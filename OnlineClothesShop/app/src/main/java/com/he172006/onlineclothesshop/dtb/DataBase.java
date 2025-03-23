@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DataBase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "OnlineClothesShop";
-    private static final int DATABASE_VERSION = 3; // Tăng version để thêm cột image
+    private static final int DATABASE_VERSION = 5; // Tăng version để thêm cột image
 
 
     // Bảng Accounts (merged ADMIN and USER)
