@@ -228,10 +228,10 @@ public class HomeActivity extends AppCompatActivity {
 //            startActivity(new Intent(this, CategoriesActivity.class));
 //            return true;
 //        }
-//        else if (itemId == R.id.menu_cart) {
-//            startActivity(new Intent(this, ShoppingCartActivity.class));
-//            return true;
-//        }
+        else if (itemId == R.id.menu_cart) {
+            startActivity(new Intent(this, ShoppingCartActivity.class));
+            return true;
+        }
 //        else if (itemId == R.id.menu_orders) {
 //            if (sessionManager.isLoggedIn()) {
 //                startActivity(new Intent(this, OrderListActivity.class));

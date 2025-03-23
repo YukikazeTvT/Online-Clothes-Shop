@@ -3,6 +3,8 @@ package com.he172006.onlineclothesshop;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -234,5 +236,59 @@ public class ProductDetail extends AppCompatActivity {
                 loadReviews();
             });
         });
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    // Xử lý sự kiện khi chọn item trong menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_logout) {
+            if (sessionManager.isLoggedIn()) {
+                sessionManager.logout();
+                Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "You are not logged in", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        } else if (itemId == R.id.menu_home) {
+            // Đã ở HomeActivity, không cần làm gì
+            return true;
+        }
+//        else if (itemId == R.id.menu_categories) {
+//            startActivity(new Intent(this, CategoriesActivity.class));
+//            return true;
+//        }
+        else if (itemId == R.id.menu_cart) {
+            startActivity(new Intent(this, ShoppingCartActivity.class));
+            return true;
+        }
+//        else if (itemId == R.id.menu_orders) {
+//            if (sessionManager.isLoggedIn()) {
+//                startActivity(new Intent(this, OrderListActivity.class));
+//            } else {
+//                Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, LoginActivity.class));
+//            }
+//            return true;
+//        }
+//        else if (itemId == R.id.menu_user_profile) {
+//            if (sessionManager.isLoggedIn()) {
+//                startActivity(new Intent(this, ProfileActivity.class));
+//            } else {
+//                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, LoginActivity.class));
+//            }
+//            return true;
+//        }
+        return super.onOptionsItemSelected(item);
     }
 }
