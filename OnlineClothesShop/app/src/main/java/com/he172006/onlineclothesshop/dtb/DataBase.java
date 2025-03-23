@@ -1,13 +1,16 @@
 package com.he172006.onlineclothesshop.dtb;
 
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+
 public class DataBase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "OnlineClothesShop";
-    private static final int DATABASE_VERSION = 2; // Tăng version để thêm cột image
+    private static final int DATABASE_VERSION = 3; // Tăng version để thêm cột image
+
 
     // Bảng Accounts (merged ADMIN and USER)
     private static final String TABLE_ACCOUNTS = "Accounts";
@@ -19,11 +22,25 @@ public class DataBase extends SQLiteOpenHelper {
     private static final String COLUMN_PHONE = "phone";
     private static final String COLUMN_ROLE = "role";
 
+
+    //Bảng Banners
+    private static final String TABLE_BANNERS = "Banners";
+    private static final String COLUMN_BANNER_ID = "bannerId";
+    private static final String COLUMN_BANNER_IMAGE = "image";
+
+
+    //Bảng Reviews
+    private static final String TABLE_REVIEWS = "Reviews";
+    private static final String COLUMN_REVIEW_ID = "reviewId";
+    private static final String COLUMN_REVIEW_CONTENT = "reviewContent";
+    private static final String COLUMN_RATING = "rating";
+    private static final String COLUMN_REVIEW_PRODUCT_ID = "productId";
     // Bảng Categories
     private static final String TABLE_CATEGORIES = "Categories";
     private static final String COLUMN_CATEGORY_ID = "categoryId";
     private static final String COLUMN_CATEGORY_NAME = "categoryName";
     private static final String COLUMN_CATEGORY_IMAGE = "image"; // Thêm cột image
+
 
     // Bảng Products
     private static final String TABLE_PRODUCTS = "Products";
@@ -35,11 +52,13 @@ public class DataBase extends SQLiteOpenHelper {
     private static final String COLUMN_IMAGE = "image";
     private static final String COLUMN_PRODUCT_CATEGORY_ID = "categoryId";
 
+
     // Bảng Cart
     private static final String TABLE_CART = "Cart";
     private static final String COLUMN_CART_ID = "cartId";
     private static final String COLUMN_QUANTITY = "quantity";
     private static final String COLUMN_DATE_ADDED = "dateAdded";
+
 
     // Bảng Orders
     private static final String TABLE_ORDERS = "Orders";
@@ -48,10 +67,12 @@ public class DataBase extends SQLiteOpenHelper {
     private static final String COLUMN_TOTAL_AMOUNT = "totalAmount";
     private static final String COLUMN_STATUS = "status";
 
+
     // Bảng OrderDetails
     private static final String TABLE_ORDER_DETAILS = "OrderDetails";
     private static final String COLUMN_ORDER_DETAIL_ID = "orderDetailId";
     private static final String COLUMN_SUBTOTAL = "subtotal";
+
 
     // Bảng Payment
     private static final String TABLE_PAYMENT = "Payment";
@@ -60,12 +81,14 @@ public class DataBase extends SQLiteOpenHelper {
     private static final String COLUMN_PAYMENT_STATUS = "paymentStatus";
     private static final String COLUMN_TRANSACTION_ID = "transactionId";
 
+
     // Bảng Shipping
     private static final String TABLE_SHIPPING = "Shipping";
     private static final String COLUMN_SHIPPING_ID = "shippingId";
     private static final String COLUMN_TRACKING_NUMBER = "trackingNumber";
     private static final String COLUMN_SHIPPING_STATUS = "shippingStatus";
     private static final String COLUMN_DELIVERY_DATE = "deliveryDate";
+
 
     // SQL để tạo bảng Accounts (merged ADMIN and USER)
     private static final String SQL_CREATE_ACCOUNTS =
@@ -77,13 +100,31 @@ public class DataBase extends SQLiteOpenHelper {
                     COLUMN_ADDRESS + " TEXT, " +
                     COLUMN_PHONE + " TEXT, " +
                     COLUMN_ROLE + " TEXT NOT NULL)";
+    //Banner
+    private static final String SQL_CREATE_BANNER =
+            "CREATE TABLE " + TABLE_BANNERS + " (" +
+                    COLUMN_BANNER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_BANNER_IMAGE + " TEXT NOT NULL)";
 
+
+    // SQL để tạo bảng Reviews
+    private static final String SQL_CREATE_REVIEWS =
+            "CREATE TABLE " + TABLE_REVIEWS + " (" +
+                    COLUMN_REVIEW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_REVIEW_CONTENT + " TEXT NOT NULL, " +
+                    COLUMN_RATING + " REAL NOT NULL, " +
+                    COLUMN_REVIEW_PRODUCT_ID + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY (" + COLUMN_REVIEW_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_PRODUCT_ID + ") ON DELETE CASCADE)";
+
+
+    // SQL để tạo bảng Categories (merged ADMIN and USER)
     // SQL để tạo bảng Categories
     private static final String SQL_CREATE_CATEGORIES =
             "CREATE TABLE " + TABLE_CATEGORIES + " (" +
                     COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_CATEGORY_NAME + " TEXT NOT NULL, " +
-                    COLUMN_CATEGORY_IMAGE + " TEXT)"; // Thêm cột image
+                    COLUMN_CATEGORY_IMAGE + " TEXT)";
+
 
     // SQL để tạo bảng Products
     private static final String SQL_CREATE_PRODUCTS =
@@ -97,6 +138,7 @@ public class DataBase extends SQLiteOpenHelper {
                     COLUMN_IMAGE + " TEXT, " +
                     "FOREIGN KEY (" + COLUMN_PRODUCT_CATEGORY_ID + ") REFERENCES " + TABLE_CATEGORIES + "(" + COLUMN_CATEGORY_ID + ") ON DELETE CASCADE)";
 
+
     // SQL để tạo bảng Cart
     private static final String SQL_CREATE_CART =
             "CREATE TABLE " + TABLE_CART + " (" +
@@ -108,6 +150,7 @@ public class DataBase extends SQLiteOpenHelper {
                     "FOREIGN KEY (" + COLUMN_ACCOUNT_ID + ") REFERENCES " + TABLE_ACCOUNTS + "(" + COLUMN_ACCOUNT_ID + ") ON DELETE CASCADE, " +
                     "FOREIGN KEY (" + COLUMN_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_PRODUCT_ID + ") ON DELETE CASCADE)";
 
+
     // SQL để tạo bảng Orders
     private static final String SQL_CREATE_ORDERS =
             "CREATE TABLE " + TABLE_ORDERS + " (" +
@@ -117,6 +160,7 @@ public class DataBase extends SQLiteOpenHelper {
                     COLUMN_TOTAL_AMOUNT + " REAL NOT NULL, " +
                     COLUMN_STATUS + " TEXT NOT NULL, " +
                     "FOREIGN KEY (" + COLUMN_ACCOUNT_ID + ") REFERENCES " + TABLE_ACCOUNTS + "(" + COLUMN_ACCOUNT_ID + ") ON DELETE CASCADE)";
+
 
     // SQL để tạo bảng OrderDetails
     private static final String SQL_CREATE_ORDER_DETAILS =
@@ -129,6 +173,7 @@ public class DataBase extends SQLiteOpenHelper {
                     "FOREIGN KEY (" + COLUMN_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COLUMN_ORDER_ID + ") ON DELETE CASCADE, " +
                     "FOREIGN KEY (" + COLUMN_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_PRODUCT_ID + ") ON DELETE CASCADE)";
 
+
     // SQL để tạo bảng Payment
     private static final String SQL_CREATE_PAYMENT =
             "CREATE TABLE " + TABLE_PAYMENT + " (" +
@@ -138,6 +183,7 @@ public class DataBase extends SQLiteOpenHelper {
                     COLUMN_PAYMENT_STATUS + " TEXT NOT NULL, " +
                     COLUMN_TRANSACTION_ID + " TEXT, " +
                     "FOREIGN KEY (" + COLUMN_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COLUMN_ORDER_ID + ") ON DELETE CASCADE)";
+
 
     // SQL để tạo bảng Shipping
     private static final String SQL_CREATE_SHIPPING =
@@ -149,30 +195,48 @@ public class DataBase extends SQLiteOpenHelper {
                     COLUMN_DELIVERY_DATE + " TEXT, " +
                     "FOREIGN KEY (" + COLUMN_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COLUMN_ORDER_ID + ") ON DELETE CASCADE)";
 
+
     public DataBase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ACCOUNTS);
         db.execSQL(SQL_CREATE_CATEGORIES);
         db.execSQL(SQL_CREATE_PRODUCTS);
+        db.execSQL(SQL_CREATE_REVIEWS);
+        db.execSQL(SQL_CREATE_BANNER);
         db.execSQL(SQL_CREATE_CART);
         db.execSQL(SQL_CREATE_ORDERS);
         db.execSQL(SQL_CREATE_ORDER_DETAILS);
         db.execSQL(SQL_CREATE_PAYMENT);
         db.execSQL(SQL_CREATE_SHIPPING);
+
+
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            // Thêm cột image vào bảng Categories nếu chưa có
-            db.execSQL("ALTER TABLE " + TABLE_CATEGORIES + " ADD COLUMN " + COLUMN_CATEGORY_IMAGE + " TEXT");
-        }
-        // Thêm các nâng cấp khác trong tương lai nếu cần
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEWS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BANNERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_DETAILS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SHIPPING);
+        onCreate(db);
     }
+
+
+
+
+
 
     // Get all accounts
     public Cursor getAllAccounts() {
@@ -180,11 +244,13 @@ public class DataBase extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM " + TABLE_ACCOUNTS, null);
     }
 
+
     // Get all products
     public Cursor getAllProducts() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_PRODUCTS, null);
     }
+
 
     // Delete account
     public boolean deleteAccount(int accountId) {
@@ -192,9 +258,12 @@ public class DataBase extends SQLiteOpenHelper {
         return db.delete(TABLE_ACCOUNTS, COLUMN_ACCOUNT_ID + "=?", new String[]{String.valueOf(accountId)}) > 0;
     }
 
+
     // Delete product
     public boolean deleteProduct(int productId) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_PRODUCTS, COLUMN_PRODUCT_ID + "=?", new String[]{String.valueOf(productId)}) > 0;
     }
 }
+
+
