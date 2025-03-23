@@ -1,48 +1,38 @@
-
-
 package com.he172006.onlineclothesshop;
-
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
-
-
-
-
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
-
-
 import com.he172006.onlineclothesshop.DAO.BannerDAO;
 import com.he172006.onlineclothesshop.DAO.CategoryDAO;
 import com.he172006.onlineclothesshop.DAO.ProductDAO;
 import com.he172006.onlineclothesshop.adapter.BannerAdapter;
 import com.he172006.onlineclothesshop.adapter.CategoryAdapter;
 import com.he172006.onlineclothesshop.adapter.ProductDisplayAdapter;
-import com.he172006.onlineclothesshop.component.HeaderComponent;
 import com.he172006.onlineclothesshop.dtb.DataBase;
 import com.he172006.onlineclothesshop.entity.Banner;
 import com.he172006.onlineclothesshop.entity.Category;
 import com.he172006.onlineclothesshop.entity.Product;
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-
-
 
 public class HomeActivity extends AppCompatActivity {
     private RecyclerView categoryRecyclerView, productRecyclerView;
@@ -51,41 +41,36 @@ public class HomeActivity extends AppCompatActivity {
     private ProductDAO productDAO;
     private BannerDAO bannerDAO;
     private CategoryDAO categoryDAO;
-
-
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private Handler bannerHandler = new Handler();
     private int bannerCurrentPosition = 0;
     private ViewPager2 bannerViewPager;
     private DataBase dbHelper;
     private SQLiteDatabase db;
-
-
-
+    private Session sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        HeaderComponent.setupHeader(this);
+
+        // Initialize SessionManager
+        sessionManager = new Session(this);
+
+        // Set up Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        TextView tvTitle = toolbar.findViewById(R.id.tvTitle);
+        if (tvTitle != null) {
+            tvTitle.setText("GUCIT");
+        }
+
         bannerDAO = new BannerDAO(this);
         categoryDAO = new CategoryDAO(this);
         productDAO = new ProductDAO(this);
-
-
-
-
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
         productRecyclerView = findViewById(R.id.productRecyclerView);
         bannerViewPager = findViewById(R.id.bannerViewPager);
-
-
-
-
-
-
-
-
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         productRecyclerView.setHasFixedSize(true);
         productRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -93,14 +78,7 @@ public class HomeActivity extends AppCompatActivity {
         loadData();
     }
 
-
-
-
-
-
     private void setupBanner() {
-
-
         executor.execute(() -> {
             if (bannerDAO.getAllBanners().isEmpty()) { // Sử dụng đối tượng bannerDAO
                 List<Banner> banners = Arrays.asList(
@@ -120,10 +98,6 @@ public class HomeActivity extends AppCompatActivity {
             for (String url : bannerImages) {
                 Log.d("BannerDebug", "Image URL: " + url);
             }
-
-
-
-
             runOnUiThread(() -> {
                 BannerAdapter bannerAdapter = new BannerAdapter(HomeActivity.this, bannerImages);
                 bannerViewPager.setAdapter(bannerAdapter);
@@ -131,9 +105,6 @@ public class HomeActivity extends AppCompatActivity {
             });
         });
     }
-
-
-
 
     private final Runnable bannerRunnable = new Runnable() {
         @Override
@@ -147,7 +118,6 @@ public class HomeActivity extends AppCompatActivity {
             bannerHandler.postDelayed(this, 3000);
         }
     };
-
 
     private void loadData() {
         executor.execute(() -> {
@@ -176,22 +146,12 @@ public class HomeActivity extends AppCompatActivity {
                 productDAO.insertProducts(products);
             }
 
-
-
-
             List<Category> categories = categoryDAO.getAllCategories();
             List<Product> products = productDAO.getAllProducts();
-
-
-
 
             runOnUiThread(() -> {
                 categoryAdapter = new CategoryAdapter(categories);
                 productDisplayAdapter = new ProductDisplayAdapter(HomeActivity.this, products);
-
-
-
-
                 categoryRecyclerView.setAdapter(categoryAdapter);
                 productRecyclerView.setAdapter(productDisplayAdapter);
                 categoryAdapter.setOnItemClickListener(category -> {
@@ -200,30 +160,15 @@ public class HomeActivity extends AppCompatActivity {
                     intent.putExtra("categoryName", category.getCategoryName());
                     startActivity(intent);
                 });
-
-
-
-
-
-
             });
         });
     }
 
-
     public void showSortMenu(View view) {
         PopupMenu popup = new PopupMenu(this, view);
         popup.getMenuInflater().inflate(R.menu.menu_sort, popup.getMenu());
-
-
-
-
         popup.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
-
-
-
-
             if (id == R.id.sort_price_low_high) {
                 sortProducts(true);
                 return true;
@@ -233,43 +178,83 @@ public class HomeActivity extends AppCompatActivity {
             }
             return false;
         });
-
-
-
-
         popup.show();
     }
-
 
     public void sortProducts(boolean lowToHigh) {
         executor.execute(() -> {
             List<Product> sortedProducts = productDAO.getAllProducts();
-
-
-
-
             Collections.sort(sortedProducts, (p1, p2) -> {
                 if (lowToHigh) {
                     return Float.compare((float) p1.getPrice(), (float) p2.getPrice());
                 } else {
-                    return Float.compare((float) p1.getPrice(), (float) p2.getPrice());
+                    return Float.compare((float) p2.getPrice(), (float) p1.getPrice());
                 }
             });
-
-
-
-
             runOnUiThread(() -> {
                 productDisplayAdapter.updateProducts(sortedProducts);
             });
         });
     }
 
+    // Thêm menu vào Activity
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
+    // Xử lý sự kiện khi chọn item trong menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_logout) {
+            if (sessionManager.isLoggedIn()) {
+                sessionManager.logout();
+                Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "You are not logged in", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        } else if (itemId == R.id.menu_home) {
+            // Đã ở HomeActivity, không cần làm gì
+            return true;
+        }
+//        else if (itemId == R.id.menu_categories) {
+//            startActivity(new Intent(this, CategoriesActivity.class));
+//            return true;
+//        }
+//        else if (itemId == R.id.menu_cart) {
+//            startActivity(new Intent(this, ShoppingCartActivity.class));
+//            return true;
+//        }
+//        else if (itemId == R.id.menu_orders) {
+//            if (sessionManager.isLoggedIn()) {
+//                startActivity(new Intent(this, OrderListActivity.class));
+//            } else {
+//                Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, LoginActivity.class));
+//            }
+//            return true;
+//        }
+//        else if (itemId == R.id.menu_user_profile) {
+//            if (sessionManager.isLoggedIn()) {
+//                startActivity(new Intent(this, ProfileActivity.class));
+//            } else {
+//                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, LoginActivity.class));
+//            }
+//            return true;
+//        }
+        else if (itemId == R.id.menu_sort) {
+            // Gọi hàm showSortMenu để hiển thị menu sort hiện có
+            showSortMenu(findViewById(R.id.toolbar));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
-
-
-
-
-
-
