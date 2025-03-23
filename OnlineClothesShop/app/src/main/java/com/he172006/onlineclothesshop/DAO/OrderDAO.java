@@ -146,4 +146,33 @@ public class OrderDAO {
             db.close();
         }
     }
+    public List<Order> getAllOrders() {
+        List<Order> orderList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = cursorToOrder(cursor);
+                orderList.add(order);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return orderList;
+    }
+
+    public int updateOrderStatus(int orderId, String newStatus) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_STATUS, newStatus);
+
+        String whereClause = COLUMN_ORDER_ID + " = ?";
+        String[] whereArgs = {String.valueOf(orderId)};
+
+        int rowsUpdated = db.update(TABLE_NAME, values, whereClause, whereArgs);
+        Log.d("OrderDAO", "Updated order ID: " + orderId + " to status: " + newStatus + ", Rows affected: " + rowsUpdated);
+
+        return rowsUpdated;
+    }
 }

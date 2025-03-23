@@ -49,8 +49,8 @@ public class AdminDashBroadActivity extends AppCompatActivity {
             // Chưa có ManageOrderActivity, hiển thị thông báo
             Toast.makeText(AdminDashBroadActivity.this, "Manage Order feature is not implemented yet", Toast.LENGTH_SHORT).show();
             // Nếu sau này có ManageOrderActivity, bạn có thể bỏ comment dòng dưới
-            // Intent intent = new Intent(AdminDashBroadActivity.this, ManageOrderActivity.class);
-            // startActivity(intent);
+             Intent intent = new Intent(AdminDashBroadActivity.this, ManageOrderActivity.class);
+             startActivity(intent);
         });
 
         layoutLogout.setOnClickListener(v -> {

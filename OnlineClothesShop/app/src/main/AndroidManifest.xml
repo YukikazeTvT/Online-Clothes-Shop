@@ -37,6 +37,13 @@
             android:name=".AddProductActivity"
             android:exported="true" />
         <activity
+            android:name=".ManageOrderActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".UpdateOrderActivity"
+            android:exported="true"/>
+
+        <activity
             android:name=".SplashScreenActivity"
             android:exported="true"
             android:theme="@style/Theme.Splash">
