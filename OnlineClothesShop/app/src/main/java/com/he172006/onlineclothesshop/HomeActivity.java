@@ -104,9 +104,9 @@ public class HomeActivity extends AppCompatActivity {
         executor.execute(() -> {
             if (bannerDAO.getAllBanners().isEmpty()) { // Sử dụng đối tượng bannerDAO
                 List<Banner> banners = Arrays.asList(
-                        new Banner("https://example.com/banner1.jpg"),
-                        new Banner("https://example.com/banner2.jpg"),
-                        new Banner("https://example.com/banner3.jpg")
+                        new Banner("https://cdn.venngage.com/template/thumbnail/small/01b644bd-e75b-4e70-b476-3a786261f066.webp"),
+                        new Banner("https://marketplace.canva.com/EAFHG6sbLsQ/1/0/1600w/canva-brown-beige-simple-special-sale-banner-lQfPvhnznqs.jpg"),
+                        new Banner("https://img.freepik.com/free-psd/luxury-men-s-fashion-template-design_23-2150855892.jpg?semt=ais_hybrid")
                 );
                 for (Banner banner : banners) {
                     bannerDAO.insertBanner(banner.getImage()); // Chèn từng banner vào DB
@@ -153,25 +153,25 @@ public class HomeActivity extends AppCompatActivity {
         executor.execute(() -> {
             if (categoryDAO.getAllCategories().isEmpty()) {
                 List<Category> categories = Arrays.asList(
-                        new Category("Quần jeans", ""),
-                        new Category("Áo sơ mi", ""),
-                        new Category("Giày sneaker", ""),
-                        new Category("Dép sandal", ""),
-                        new Category("Mũ lưỡi trai", ""),
-                        new Category("Ba lô", ""),
-                        new Category("Túi xách", ""),
-                        new Category("Kính râm", "")
+//                        new Category("Quần jeans", ""),
+//                        new Category("Áo sơ mi", ""),
+//                        new Category("Giày sneaker", ""),
+//                        new Category("Dép sandal", ""),
+//                        new Category("Mũ lưỡi trai", ""),
+//                        new Category("Ba lô", ""),
+//                        new Category("Túi xách", ""),
+//                        new Category("Kính râm", "")
                 );
                 categoryDAO.insertCategories(categories);
             }
             if (productDAO.getAllProducts().isEmpty()) {
                 List<Product> products = Arrays.asList(
-                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
-                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
-                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
-                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
-                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
-                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg")
+//                        new Product(1, "Quần Jean Dáng Carpenter", "Quần chất jean thuần cotton độ co dãn không nhiều, cho form quần luôn giữ dáng nguyên bản", 14000, 10, "https://bizweb.dktcdn.net/100/045/077/products/o1cn01vri9gj1zqm7pjqxex-2201202046709-0-cib-5f7a7fba-c83f-4d92-b8da-a95b9799feed.jpg?v=1740247074120"),
+//                        new Product(1, "Áo sơ mi", "Mô tả sản phẩm", 13200, 10, "https://example.com/image.jpg"),
+//                        new Product(1, "Giày sneaker", "Mô tả sản phẩm", 14100, 10, "https://example.com/image.jpg"),
+//                        new Product(1, "Mũ lưỡi trai", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
+//                        new Product(1, "Ba lô", "Mô tả sản phẩm", 15600, 10, "https://example.com/image.jpg"),
+//                        new Product(1, "Túi xách", "Mô tả sản phẩm", 17000, 10, "https://example.com/image.jpg")
                 );
                 productDAO.insertProducts(products);
             }
