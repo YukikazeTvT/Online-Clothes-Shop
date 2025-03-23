@@ -212,4 +212,28 @@ public class AccountDAO {
             db.close();
         }
     }
+    public boolean updateAccounts(Account account) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, account.getName());
+        values.put(COLUMN_EMAIL, account.getEmail());
+        values.put(COLUMN_PASSWORD, account.getPassword());
+        values.put(COLUMN_ADDRESS, account.getAddress());
+        values.put(COLUMN_PHONE, account.getPhone());
+        values.put(COLUMN_ROLE, account.getRole());
+
+        String whereClause = COLUMN_ACCOUNT_ID + " = ?";
+        String[] whereArgs = {String.valueOf(account.getAccountId())};
+
+        int rowsUpdated = db.update(TABLE_NAME, values, whereClause, whereArgs);
+        db.close(); // Đóng database sau khi cập nhật
+
+        if (rowsUpdated > 0) {
+            Log.d("AccountDAO", "Cập nhật thành công tài khoản ID: " + account.getAccountId());
+            return true;
+        } else {
+            Log.e("AccountDAO", "Cập nhật thất bại tài khoản ID: " + account.getAccountId());
+            return false;
+        }
+    }
 }
