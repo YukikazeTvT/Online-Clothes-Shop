@@ -24,10 +24,6 @@
         app:showAsAction="never"
         android:icon="@drawable/ic_logout" />
 
-    <item
-        android:id="@+id/menu_categories"
-        android:title="Categories"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_cart"
@@ -35,11 +31,7 @@
         android:icon="@android:drawable/ic_menu_add"
         app:showAsAction="ifRoom" />
 
-    <!-- Thêm mục Order -->
-    <item
-        android:id="@+id/menu_orders"
-        android:title="Orders"
-        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/menu_logout"

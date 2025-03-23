@@ -123,6 +123,7 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
         }
     }
 
+    // Thêm menu vào Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -146,7 +147,7 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
             }
             return true;
         } else if (itemId == R.id.menu_home) {
-            // Đã ở HomeActivity, không cần làm gì
+            startActivity(new Intent(this, HomeActivity.class));
             return true;
         }
 //        else if (itemId == R.id.menu_categories) {
@@ -154,18 +155,9 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
 //            return true;
 //        }
         else if (itemId == R.id.menu_cart) {
-            startActivity(new Intent(this, ShoppingCartActivity.class));
+            // Đã ở ShoppingCartActivity, không cần làm gì
             return true;
         }
-//        else if (itemId == R.id.menu_orders) {
-//            if (sessionManager.isLoggedIn()) {
-//                startActivity(new Intent(this, OrderListActivity.class));
-//            } else {
-//                Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, LoginActivity.class));
-//            }
-//            return true;
-//        }
 //        else if (itemId == R.id.menu_user_profile) {
 //            if (sessionManager.isLoggedIn()) {
 //                startActivity(new Intent(this, ProfileActivity.class));
@@ -174,7 +166,11 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
 //                startActivity(new Intent(this, LoginActivity.class));
 //            }
 //            return true;
+//        } else if (itemId == R.id.menu_sort) {
+//            // ShoppingCartActivity không cần sort, có thể bỏ qua hoặc hiển thị thông báo
+//            Toast.makeText(this, "Sort is not available in Cart", Toast.LENGTH_SHORT).show();
+//            return true;
 //        }
-        return super.onOptionsItemSelected(item);
+       return super.onOptionsItemSelected(item);
     }
 }
