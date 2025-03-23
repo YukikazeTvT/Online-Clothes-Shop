@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@android:color/white">
+
+
+
+
+
+
+
+
+    <ImageView
+        android:id="@+id/searchProductImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder_image" />
+
+
+
+
+
+
+
+
+    <LinearLayout
+        android:layout_width="521dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical">
+
+
+
+
+
+
+
+
+        <TextView
+            android:id="@+id/searchProductName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên sản phẩm"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+
+
+
+
+
+
+
+        <TextView
+            android:id="@+id/searchProductPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="100.000đ"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="20sp" />
+    </LinearLayout>
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+

@@ -2,26 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item
         android:id="@+id/menu_user_profile"
         android:title="User Profile"
         app:showAsAction="ifRoom" />
-
+    <item android:id="@+id/menu_sort"
+        android:title="Sort By"/>
     <item
         android:id="@+id/menu_home"
         android:title="Home"
         app:showAsAction="never"
         android:icon="@drawable/ic_logout" />
 
+
     <item
         android:id="@+id/menu_categories"
         android:title="Categories"
         app:showAsAction="never" />
 
+
     <item
         android:id="@+id/menu_cart"
         android:title="Cart"
         app:showAsAction="ifRoom" />
+
 
     <!-- Thêm mục Order -->
     <item
@@ -29,8 +34,13 @@
         android:title="Orders"
         app:showAsAction="never" />
 
+
     <item
         android:id="@+id/menu_logout"
         android:title="Logout"
         app:showAsAction="never" />
 </menu>
+
+
+
+

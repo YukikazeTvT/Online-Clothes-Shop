@@ -1,198 +1,277 @@
+
+
 package com.he172006.onlineclothesshop;
 
+
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.PopupMenu;
+
+
+
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
+
+
+import com.he172006.onlineclothesshop.DAO.BannerDAO;
 import com.he172006.onlineclothesshop.DAO.CategoryDAO;
 import com.he172006.onlineclothesshop.DAO.ProductDAO;
-import com.he172006.onlineclothesshop.adapter.CategorySliderAdapter;
-import com.he172006.onlineclothesshop.adapter.ProductGridAdapter;
+import com.he172006.onlineclothesshop.adapter.BannerAdapter;
+import com.he172006.onlineclothesshop.adapter.CategoryAdapter;
+import com.he172006.onlineclothesshop.adapter.ProductDisplayAdapter;
+import com.he172006.onlineclothesshop.component.HeaderComponent;
+import com.he172006.onlineclothesshop.dtb.DataBase;
+import com.he172006.onlineclothesshop.entity.Banner;
 import com.he172006.onlineclothesshop.entity.Category;
 import com.he172006.onlineclothesshop.entity.Product;
+
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
+
 
 public class HomeActivity extends AppCompatActivity {
+    private RecyclerView categoryRecyclerView, productRecyclerView;
+    private CategoryAdapter categoryAdapter;
+    private ProductDisplayAdapter productDisplayAdapter;
+    private ProductDAO productDAO;
+    private BannerDAO bannerDAO;
+    private CategoryDAO categoryDAO;
 
-    private Toolbar toolbar;
-    private ViewPager2 vpCategorySlider;
-    private TabLayout tabDots;
-    private GridView gvProducts;
-    private Button btnToProductList;
-    private CategorySliderAdapter categorySliderAdapter;
-    private ProductGridAdapter productGridAdapter;
-    private List<Category> categoryList;
-    private List<Product> productList;
-    private Handler sliderHandler = new Handler();
-    private Runnable sliderRunnable;
-    private Session sessionManager;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private Handler bannerHandler = new Handler();
+    private int bannerCurrentPosition = 0;
+    private ViewPager2 bannerViewPager;
+    private DataBase dbHelper;
+    private SQLiteDatabase db;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_page);
+        setContentView(R.layout.activity_home);
+        HeaderComponent.setupHeader(this);
+        bannerDAO = new BannerDAO(this);
+        categoryDAO = new CategoryDAO(this);
+        productDAO = new ProductDAO(this);
 
-        // Initialize SessionManager
-        sessionManager = new Session(this);
 
-        // Initialize views
-        toolbar = findViewById(R.id.toolbar);
-        vpCategorySlider = findViewById(R.id.vpCategorySlider);
-        tabDots = findViewById(R.id.tabDots);
-        gvProducts = findViewById(R.id.gvProducts);
-        btnToProductList = findViewById(R.id.btnToProductList);
 
-        // Set up Toolbar
-        setSupportActionBar(toolbar);
 
-        // Load categories and products from database
-        loadCategories();
-        loadProducts();
+        categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
+        productRecyclerView = findViewById(R.id.productRecyclerView);
+        bannerViewPager = findViewById(R.id.bannerViewPager);
 
-        // Setup slider for categories
-        setupCategorySlider();
 
-        // Setup GridView for products
-        setupProductGrid();
 
-        // Handle "To Product List" button click
-        btnToProductList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Intent intent = new Intent(HomeActivity.this, ProductListActivity.class);
-                // startActivity(intent);
+
+
+
+
+
+        categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        productRecyclerView.setHasFixedSize(true);
+        productRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        setupBanner();
+        loadData();
+    }
+
+
+
+
+
+
+    private void setupBanner() {
+
+
+        executor.execute(() -> {
+            if (bannerDAO.getAllBanners().isEmpty()) { // Sử dụng đối tượng bannerDAO
+                List<Banner> banners = Arrays.asList(
+                        new Banner("https://example.com/banner1.jpg"),
+                        new Banner("https://example.com/banner2.jpg"),
+                        new Banner("https://example.com/banner3.jpg")
+                );
+                for (Banner banner : banners) {
+                    bannerDAO.insertBanner(banner.getImage()); // Chèn từng banner vào DB
+                }
             }
+            List<Banner> banners = bannerDAO.getAllBanners();
+            List<String> bannerImages = new ArrayList<>();
+            for (Banner banner : banners) {
+                bannerImages.add(banner.getImage());
+            }
+            for (String url : bannerImages) {
+                Log.d("BannerDebug", "Image URL: " + url);
+            }
+
+
+
+
+            runOnUiThread(() -> {
+                BannerAdapter bannerAdapter = new BannerAdapter(HomeActivity.this, bannerImages);
+                bannerViewPager.setAdapter(bannerAdapter);
+                bannerHandler.postDelayed(bannerRunnable, 3000);
+            });
         });
     }
 
-    private void loadCategories() {
-        CategoryDAO categoryDAO = new CategoryDAO(this);
-        categoryList = categoryDAO.getAllCategories();
-        categoryDAO.close();
 
-        // Lấy 4 danh mục ngẫu nhiên
-        if (categoryList.size() > 4) {
-            Collections.shuffle(categoryList);
-            categoryList = categoryList.subList(0, 4);
+
+
+    private final Runnable bannerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (bannerCurrentPosition < 2) {
+                bannerCurrentPosition++;
+            } else {
+                bannerCurrentPosition = 0;
+            }
+            bannerViewPager.setCurrentItem(bannerCurrentPosition, true);
+            bannerHandler.postDelayed(this, 3000);
         }
+    };
+
+
+    private void loadData() {
+        executor.execute(() -> {
+            if (categoryDAO.getAllCategories().isEmpty()) {
+                List<Category> categories = Arrays.asList(
+                        new Category("Quần jeans", ""),
+                        new Category("Áo sơ mi", ""),
+                        new Category("Giày sneaker", ""),
+                        new Category("Dép sandal", ""),
+                        new Category("Mũ lưỡi trai", ""),
+                        new Category("Ba lô", ""),
+                        new Category("Túi xách", ""),
+                        new Category("Kính râm", "")
+                );
+                categoryDAO.insertCategories(categories);
+            }
+            if (productDAO.getAllProducts().isEmpty()) {
+                List<Product> products = Arrays.asList(
+                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
+                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
+                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
+                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
+                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg"),
+                        new Product(1, "Quần", "Mô tả sản phẩm", 15000, 10, "https://example.com/image.jpg")
+                );
+                productDAO.insertProducts(products);
+            }
+
+
+
+
+            List<Category> categories = categoryDAO.getAllCategories();
+            List<Product> products = productDAO.getAllProducts();
+
+
+
+
+            runOnUiThread(() -> {
+                categoryAdapter = new CategoryAdapter(categories);
+                productDisplayAdapter = new ProductDisplayAdapter(HomeActivity.this, products);
+
+
+
+
+                categoryRecyclerView.setAdapter(categoryAdapter);
+                productRecyclerView.setAdapter(productDisplayAdapter);
+                categoryAdapter.setOnItemClickListener(category -> {
+                    Intent intent = new Intent(HomeActivity.this, ListProductByCategory.class);
+                    intent.putExtra("categoryId", category.getCategoryId());
+                    intent.putExtra("categoryName", category.getCategoryName());
+                    startActivity(intent);
+                });
+
+
+
+
+
+
+            });
+        });
     }
 
-    private void loadProducts() {
-        ProductDAO productDAO = new ProductDAO(this);
-        productList = productDAO.getAllProducts();
-        productDAO.close();
 
-        // Lấy 8 sản phẩm đầu tiên
-        if (productList.size() > 8) {
-            productList = productList.subList(0, 8);
-        }
+    public void showSortMenu(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+        popup.getMenuInflater().inflate(R.menu.menu_sort, popup.getMenu());
+
+
+
+
+        popup.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+
+
+
+
+            if (id == R.id.sort_price_low_high) {
+                sortProducts(true);
+                return true;
+            } else if (id == R.id.sort_price_high_low) {
+                sortProducts(false);
+                return true;
+            }
+            return false;
+        });
+
+
+
+
+        popup.show();
     }
 
-    private void setupCategorySlider() {
-        categorySliderAdapter = new CategorySliderAdapter(this, categoryList);
-        vpCategorySlider.setAdapter(categorySliderAdapter);
 
-        // Kết nối TabLayout với ViewPager2 để hiển thị chấm
-        new TabLayoutMediator(tabDots, vpCategorySlider, (tab, position) -> {
-            // Không cần thiết lập nội dung cho tab vì chỉ hiển thị chấm
-        }).attach();
+    public void sortProducts(boolean lowToHigh) {
+        executor.execute(() -> {
+            List<Product> sortedProducts = productDAO.getAllProducts();
 
-        // Tự động cuộn slider
-        sliderRunnable = new Runnable() {
-            @Override
-            public void run() {
-                int currentItem = vpCategorySlider.getCurrentItem();
-                int totalItems = categorySliderAdapter.getItemCount();
-                if (currentItem < totalItems - 1) {
-                    vpCategorySlider.setCurrentItem(currentItem + 1);
+
+
+
+            Collections.sort(sortedProducts, (p1, p2) -> {
+                if (lowToHigh) {
+                    return Float.compare((float) p1.getPrice(), (float) p2.getPrice());
                 } else {
-                    vpCategorySlider.setCurrentItem(0);
+                    return Float.compare((float) p1.getPrice(), (float) p2.getPrice());
                 }
-                sliderHandler.postDelayed(this, 3000); // Cuộn mỗi 3 giây
-            }
-        };
-        sliderHandler.postDelayed(sliderRunnable, 3000);
+            });
+
+
+
+
+            runOnUiThread(() -> {
+                productDisplayAdapter.updateProducts(sortedProducts);
+            });
+        });
     }
 
-    private void setupProductGrid() {
-        productGridAdapter = new ProductGridAdapter(this, productList);
-        gvProducts.setAdapter(productGridAdapter);
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sliderHandler.removeCallbacks(sliderRunnable);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        sliderHandler.postDelayed(sliderRunnable, 3000);
-    }
 
-    // Thêm menu vào Activity
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
-    }
+}
 
-    // Xử lý sự kiện khi chọn item trong menu
-                @Override
-                public boolean onOptionsItemSelected(MenuItem item) {
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.menu_logout) {
-                        if (sessionManager.isLoggedIn()) {
-                            sessionManager.logout();
-                            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(this, LoginActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(this, "You are not logged in", Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
-                    }
-//                    } else if (itemId == R.id.menu_home) {
-//                        // Đã ở HomeActivity, không cần làm gì
-//                        return true;
-//                    } else if (itemId == R.id.menu_categories) {
-//                        startActivity(new Intent(this, CategoriesActivity.class));
-//                        return true;
-//                    } else if (itemId == R.id.menu_cart) {
-//                        startActivity(new Intent(this, ShoppingCartActivity.class));
-//                        return true;
-//                    } else if (itemId == R.id.menu_orders) {
-//                        if (sessionManager.isLoggedIn()) {
-//                            startActivity(new Intent(this, OrderListActivity.class));
-//                        } else {
-//                            Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
-//                            startActivity(new Intent(this, LoginActivity.class));
-//                        }
-//                        return true;
-//                    } else if (itemId == R.id.menu_user_profile) {
-//                        if (sessionManager.isLoggedIn()) {
-//                            startActivity(new Intent(this, ProfileActivity.class));
-//                        } else {
-//                            Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
-//                            startActivity(new Intent(this, LoginActivity.class));
-//                        }
-//                        return true;
-//                    }
-                    return super.onOptionsItemSelected(item);
-                }
-            }
+
+
+
+
+

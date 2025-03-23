@@ -1,16 +1,20 @@
 package com.he172006.onlineclothesshop.DAO;
 
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+
 import com.he172006.onlineclothesshop.dtb.DataBase;
 import com.he172006.onlineclothesshop.entity.Category;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class CategoryDAO {
     private static final String TABLE_NAME = "Categories";
@@ -21,12 +25,14 @@ public class CategoryDAO {
     private SQLiteDatabase db;
     private final Context context;
 
+
     public CategoryDAO(Context context) {
         this.context = context;
         dbHelper = new DataBase(context);
         db = dbHelper.getWritableDatabase();
         // Không gọi insertSampleCategories() ở đây, sẽ gọi từ nơi khác nếu cần
     }
+
 
     // Insert a new category
     public long insertCategory(Category category) {
@@ -37,6 +43,7 @@ public class CategoryDAO {
         Log.d("CategoryDAO", "Inserted category with name: " + category.getCategoryName() + ", Result: " + result);
         return result;
     }
+
 
     // Update an existing category
     public int updateCategory(Category category) {
@@ -50,6 +57,7 @@ public class CategoryDAO {
         return rowsUpdated;
     }
 
+
     // Delete a category
     public boolean deleteCategory(int categoryId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -59,6 +67,7 @@ public class CategoryDAO {
         Log.d("CategoryDAO", "Deleted category with ID: " + categoryId + ", Rows affected: " + rowsDeleted);
         return rowsDeleted > 0;
     }
+
 
     // Get category by ID
     public Category getCategoryById(int categoryId) {
@@ -78,11 +87,34 @@ public class CategoryDAO {
         return null;
     }
 
+
     // Get category name by ID
     public String getCategoryNameById(int categoryId) {
         Category category = getCategoryById(categoryId);
         return category != null ? category.getCategoryName() : null;
     }
+    public void insertCategories(List<Category> categories) {
+        db.beginTransaction();
+        try {
+            for (Category category : categories) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_CATEGORY_NAME, category.getCategoryName());
+                values.put(COLUMN_CATEGORY_IMAGE, category.getImage());
+                long result = db.insert(TABLE_NAME, null, values);
+                if (result == -1) {
+                    Log.e("CategoryDAO", "Failed to insert category: " + category.getCategoryName());
+                } else {
+                    Log.d("CategoryDAO", "Inserted category with ID: " + result);
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e("CategoryDAO", "Error inserting categories", e);
+        } finally {
+            db.endTransaction();
+        }
+    }
+
 
     // Get all categories
     public List<Category> getAllCategories() {
@@ -99,10 +131,12 @@ public class CategoryDAO {
         return categoryList;
     }
 
+
     // Insert sample categories for testing
     public void insertSampleCategories() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, null, null); // Clear existing data
+
 
         // Sample category 1: Women's Clothing
         ContentValues values1 = new ContentValues();
@@ -111,12 +145,14 @@ public class CategoryDAO {
         long result1 = db.insert(TABLE_NAME, null, values1);
         Log.d("CategoryDAO", "Inserted category Women's Clothing, result: " + result1);
 
+
         // Sample category 2: Men's Clothing
         ContentValues values2 = new ContentValues();
         values2.put(COLUMN_CATEGORY_NAME, "Men's Clothing");
         values2.put(COLUMN_CATEGORY_IMAGE, "mens_clothing.jpg");
         long result2 = db.insert(TABLE_NAME, null, values2);
         Log.d("CategoryDAO", "Inserted category Men's Clothing, result: " + result2);
+
 
         // Sample category 3: Kids' Clothing
         ContentValues values3 = new ContentValues();
@@ -125,12 +161,14 @@ public class CategoryDAO {
         long result3 = db.insert(TABLE_NAME, null, values3);
         Log.d("CategoryDAO", "Inserted category Kids' Clothing, result: " + result3);
 
+
         // Sample category 4: Sportswear
         ContentValues values4 = new ContentValues();
         values4.put(COLUMN_CATEGORY_NAME, "Sportswear");
         values4.put(COLUMN_CATEGORY_IMAGE, "sportswear.jpg");
         long result4 = db.insert(TABLE_NAME, null, values4);
         Log.d("CategoryDAO", "Inserted category Sportswear, result: " + result4);
+
 
         // Sample category 5: Accessories (liên quan đến Clothes)
         ContentValues values5 = new ContentValues();
@@ -139,16 +177,20 @@ public class CategoryDAO {
         long result5 = db.insert(TABLE_NAME, null, values5);
         Log.d("CategoryDAO", "Inserted category Accessories, result: " + result5);
 
-        db.close();
+
     }
+
 
     // Convert cursor to Category object
     private Category cursorToCategory(Cursor cursor) {
         int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID));
         String categoryName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_NAME));
         String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_IMAGE));
-        return new Category(categoryId, categoryName, image);
+        Category category = new Category(categoryName, image);
+        category.setCategoryId(categoryId);
+        return category;
     }
+
 
     public void close() {
         if (db != null && db.isOpen()) {
@@ -156,3 +198,7 @@ public class CategoryDAO {
         }
     }
 }
+
+
+
+

@@ -1,16 +1,20 @@
 package com.he172006.onlineclothesshop.DAO;
 
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+
 import com.he172006.onlineclothesshop.dtb.DataBase;
 import com.he172006.onlineclothesshop.entity.Product;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class ProductDAO {
     private static final String TABLE_NAME = "Products";
@@ -25,11 +29,13 @@ public class ProductDAO {
     private SQLiteDatabase db;
     private final Context context;
 
+
     public ProductDAO(Context context) {
         this.context = context;
         dbHelper = new DataBase(context);
         db = dbHelper.getWritableDatabase();
     }
+
 
     // Insert a new product
     public long insertProduct(Product product) {
@@ -44,6 +50,36 @@ public class ProductDAO {
         Log.d("ProductDAO", "Inserted product with name: " + product.getProductName() + ", Result: " + result);
         return result;
     }
+    public void insertProducts(List<Product> products) {
+        db.beginTransaction();
+        try {
+            for (Product product : products) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_PRODUCT_NAME, product.getProductName());
+                values.put(COLUMN_PRICE, product.getPrice());
+                values.put(COLUMN_IMAGE, product.getImage());
+                values.put(COLUMN_STOCK, product.getStock());
+                values.put(COLUMN_CATEGORY_ID, product.getCategoryId());
+
+
+                // Thực hiện chèn dữ liệu vào database
+                long result = db.insert(TABLE_NAME, null, values);
+                if (result == -1) {
+                    Log.e("ProductDAO", "Failed to insert product: " + product.getProductName());
+                } else {
+                    Log.d("ProductDAO", "Inserted product with ID: " + result);
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e("ProductDAO", "Error inserting products", e);
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+
+
 
     // Update an existing product
     public int updateProduct(Product product) {
@@ -61,6 +97,7 @@ public class ProductDAO {
         return rowsUpdated;
     }
 
+
     // Delete a product
     public boolean deleteProduct(int productId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -71,6 +108,7 @@ public class ProductDAO {
         return rowsDeleted > 0;
     }
 
+
     // Delete all products in a category
     public void deleteProductsByCategory(int categoryId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -79,6 +117,7 @@ public class ProductDAO {
         int rowsDeleted = db.delete(TABLE_NAME, whereClause, whereArgs);
         Log.d("ProductDAO", "Deleted products in category ID: " + categoryId + ", Rows affected: " + rowsDeleted);
     }
+
 
     // Get product by ID
     public Product getProductById(int productId) {
@@ -98,6 +137,7 @@ public class ProductDAO {
         return null;
     }
 
+
     // Get all products
     public List<Product> getAllProducts() {
         List<Product> productList = new ArrayList<>();
@@ -112,6 +152,7 @@ public class ProductDAO {
         cursor.close();
         return productList;
     }
+
 
     // Get products by category ID
     public List<Product> getProductsByCategoryId(int categoryId) {
@@ -131,6 +172,7 @@ public class ProductDAO {
         return productList;
     }
 
+
     // Get product count by category ID
     public int getProductCountByCategory(int categoryId) {
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_CATEGORY_ID + " = ?";
@@ -143,10 +185,12 @@ public class ProductDAO {
         return count;
     }
 
+
     // Insert sample products for testing
     public void insertSampleProducts() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, null, null); // Clear existing data
+
 
         ContentValues values1 = new ContentValues();
         values1.put(COLUMN_CATEGORY_ID, 1); // Women's Clothing
@@ -158,6 +202,7 @@ public class ProductDAO {
         long result1 = db.insert(TABLE_NAME, null, values1);
         Log.d("ProductDAO", "Inserted product Women's T-Shirt, result: " + result1);
 
+
         ContentValues values2 = new ContentValues();
         values2.put(COLUMN_CATEGORY_ID, 2); // Men's Clothing
         values2.put(COLUMN_PRODUCT_NAME, "Men's Jacket");
@@ -167,6 +212,7 @@ public class ProductDAO {
         values2.put(COLUMN_IMAGE, "mens_jacket.jpg");
         long result2 = db.insert(TABLE_NAME, null, values2);
         Log.d("ProductDAO", "Inserted product Men's Jacket, result: " + result2);
+
 
         ContentValues values3 = new ContentValues();
         values3.put(COLUMN_CATEGORY_ID, 3); // Kids' Clothing
@@ -178,11 +224,11 @@ public class ProductDAO {
         long result3 = db.insert(TABLE_NAME, null, values3);
         Log.d("ProductDAO", "Inserted product Kids' Dress, result: " + result3);
 
-        db.close();
+
     }
 
-    // Convert cursor to Product object
-    private Product cursorToProduct(Cursor cursor) {
+
+    public Product cursorToProduct(Cursor cursor) {
         int productId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_ID));
         int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID));
         String productName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_NAME));
@@ -190,8 +236,13 @@ public class ProductDAO {
         double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
         int stock = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STOCK));
         String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
-        return new Product(productId, categoryId, productName, description, price, stock, image);
+
+
+        Product product = new Product(categoryId, productName, description, price, stock, image);
+        product.setProductId(productId);
+        return product;
     }
+
 
     public void close() {
         if (db != null && db.isOpen()) {
@@ -199,3 +250,7 @@ public class ProductDAO {
         }
     }
 }
+
+
+
+
