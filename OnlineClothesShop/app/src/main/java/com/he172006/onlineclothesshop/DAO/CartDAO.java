@@ -29,16 +29,45 @@ public class CartDAO {
         db = dbHelper.getWritableDatabase();
     }
 
-    // Insert a new cart item
+    // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng của người dùng chưa
+    public Cart getCartByAccountAndProduct(int accountId, int productId) {
+        String table = TABLE_NAME;
+        String[] columns = {COLUMN_CART_ID, COLUMN_ACCOUNT_ID, COLUMN_PRODUCT_ID, COLUMN_QUANTITY, COLUMN_DATE_ADDED};
+        String selection = COLUMN_ACCOUNT_ID + " = ? AND " + COLUMN_PRODUCT_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(accountId), String.valueOf(productId)};
+        Cursor cursor = db.query(table, columns, selection, selectionArgs, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            Cart cart = cursorToCart(cursor);
+            cursor.close();
+            return cart;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return null;
+    }
+
+    // Insert a new cart item or update if exists
     public long insertCart(Cart cart) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_ACCOUNT_ID, cart.getAccountId());
-        values.put(COLUMN_PRODUCT_ID, cart.getProductId());
-        values.put(COLUMN_QUANTITY, cart.getQuantity());
-        values.put(COLUMN_DATE_ADDED, cart.getDateAdded());
-        long result = db.insert(TABLE_NAME, null, values);
-        Log.d("CartDAO", "Inserted cart item for account ID: " + cart.getAccountId() + ", Result: " + result);
-        return result;
+        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
+        Cart existingCart = getCartByAccountAndProduct(cart.getAccountId(), cart.getProductId());
+        if (existingCart != null) {
+            // Nếu đã tồn tại, cập nhật số lượng
+            existingCart.setQuantity(existingCart.getQuantity() + cart.getQuantity());
+            existingCart.setDateAdded(cart.getDateAdded());
+            updateCart(existingCart);
+            return existingCart.getCartId();
+        } else {
+            // Nếu chưa tồn tại, thêm mới
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ACCOUNT_ID, cart.getAccountId());
+            values.put(COLUMN_PRODUCT_ID, cart.getProductId());
+            values.put(COLUMN_QUANTITY, cart.getQuantity());
+            values.put(COLUMN_DATE_ADDED, cart.getDateAdded());
+            long result = db.insert(TABLE_NAME, null, values);
+            Log.d("CartDAO", "Inserted cart item for account ID: " + cart.getAccountId() + ", Result: " + result);
+            return result;
+        }
     }
 
     // Update an existing cart item
@@ -57,7 +86,6 @@ public class CartDAO {
 
     // Delete a cart item
     public boolean deleteCart(int cartId) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
         String whereClause = COLUMN_CART_ID + " = ?";
         String[] whereArgs = {String.valueOf(cartId)};
         int rowsDeleted = db.delete(TABLE_NAME, whereClause, whereArgs);
@@ -103,7 +131,6 @@ public class CartDAO {
 
     // Insert sample cart items for testing
     public void insertSampleCartItems() {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, null, null); // Clear existing data
 
         ContentValues values1 = new ContentValues();
@@ -121,8 +148,6 @@ public class CartDAO {
         values2.put(COLUMN_DATE_ADDED, "2025-03-21");
         long result2 = db.insert(TABLE_NAME, null, values2);
         Log.d("CartDAO", "Inserted cart item for account ID 2, result: " + result2);
-
-        db.close();
     }
 
     // Convert cursor to Cart object
@@ -138,6 +163,9 @@ public class CartDAO {
     public void close() {
         if (db != null && db.isOpen()) {
             db.close();
+        }
+        if (dbHelper != null) {
+            dbHelper.close();
         }
     }
 }
