@@ -1,4 +1,5 @@
 package com.he172006.onlineclothesshop;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.he172006.onlineclothesshop.DAO.AccountDAO;
@@ -40,6 +41,13 @@ public class Session {
         Account account = accountDAO.getAccountById(accountId);
         accountDAO.close();
         return account;
+    }
+
+    public int getAccountId() {
+        if (!isLoggedIn()) {
+            return -1; // Trả về -1 nếu chưa đăng nhập
+        }
+        return pref.getInt(KEY_ACCOUNT_ID, -1); // Trả về accountId từ SharedPreferences
     }
 
     public void logout() {

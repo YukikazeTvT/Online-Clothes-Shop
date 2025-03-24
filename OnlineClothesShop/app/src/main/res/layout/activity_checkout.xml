@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="CHECKOUT"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Nội dung -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Order Summary -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ORDER SUMMARY"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/txtSubtotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subtotal: USD$0.00"
+                android:padding="4dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtShipping"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shipping: Free express"
+                android:padding="4dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total: USD$0.00"
+                android:padding="4dp"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VIEW DETAILS"
+                android:padding="8dp"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please note that your billing details will be verified and your credit card will be charged at the time of shipment. For made to order, DIY, personalized and selected Decor items, payment will be taken at the time the order is placed."
+                android:padding="8dp"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnConfirmCheckout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#000000"
+                android:text="CHECKOUT"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

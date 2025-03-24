@@ -1,5 +1,8 @@
 package com.he172006.onlineclothesshop.entity;
-public class Cart {
+
+import java.io.Serializable;
+
+public class Cart implements Serializable { // Thêm implements Serializable
     private int cartId;
     private int accountId;
     private int productId;

@@ -57,11 +57,19 @@ public class OrderDetailDAO {
 
     // Delete an order detail
     public boolean deleteOrderDetail(int orderDetailId) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
         String whereClause = COLUMN_ORDER_DETAIL_ID + " = ?";
         String[] whereArgs = {String.valueOf(orderDetailId)};
         int rowsDeleted = db.delete(TABLE_NAME, whereClause, whereArgs);
         Log.d("OrderDetailDAO", "Deleted order detail with ID: " + orderDetailId + ", Rows affected: " + rowsDeleted);
+        return rowsDeleted > 0;
+    }
+
+    // Delete all order details by order ID
+    public boolean deleteOrderDetailsByOrderId(int orderId) {
+        String whereClause = COLUMN_ORDER_ID + " = ?";
+        String[] whereArgs = {String.valueOf(orderId)};
+        int rowsDeleted = db.delete(TABLE_NAME, whereClause, whereArgs);
+        Log.d("OrderDetailDAO", "Deleted order details for order ID: " + orderId + ", Rows affected: " + rowsDeleted);
         return rowsDeleted > 0;
     }
 
@@ -103,26 +111,23 @@ public class OrderDetailDAO {
 
     // Insert sample order details for testing
     public void insertSampleOrderDetails() {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, null, null); // Clear existing data
 
         ContentValues values1 = new ContentValues();
         values1.put(COLUMN_ORDER_ID, 1);
         values1.put(COLUMN_PRODUCT_ID, 1);
         values1.put(COLUMN_QUANTITY, 2);
-        values1.put(COLUMN_SUBTOTAL, 1999.98);
+        values1.put(COLUMN_SUBTOTAL, 59.98); // 2 * 29.99
         long result1 = db.insert(TABLE_NAME, null, values1);
         Log.d("OrderDetailDAO", "Inserted order detail for order ID 1, result: " + result1);
 
         ContentValues values2 = new ContentValues();
         values2.put(COLUMN_ORDER_ID, 2);
         values2.put(COLUMN_PRODUCT_ID, 2);
-        values2.put(COLUMN_QUANTITY, 3);
-        values2.put(COLUMN_SUBTOTAL, 59.97);
+        values2.put(COLUMN_QUANTITY, 1);
+        values2.put(COLUMN_SUBTOTAL, 79.99); // 1 * 79.99
         long result2 = db.insert(TABLE_NAME, null, values2);
         Log.d("OrderDetailDAO", "Inserted order detail for order ID 2, result: " + result2);
-
-        db.close();
     }
 
     // Convert cursor to OrderDetail object
@@ -138,6 +143,9 @@ public class OrderDetailDAO {
     public void close() {
         if (db != null && db.isOpen()) {
             db.close();
+        }
+        if (dbHelper != null) {
+            dbHelper.close();
         }
     }
 }

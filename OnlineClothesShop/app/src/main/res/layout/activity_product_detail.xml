@@ -1,48 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-
-
-
-    <!-- Header -->
-    <LinearLayout
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         android:elevation="8dp"
-        android:orientation="vertical"
-        android:padding="16dp">
+        app:titleTextColor="@android:color/black"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-
-
-
-        <include layout="@layout/header_component" />
-    </LinearLayout>
-
-
-
+        <!-- Tiêu đề của Toolbar -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="PRODUCT DETAIL"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- Nội dung cuộn -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:paddingTop="100dp">
-
-
-
+        android:layout_below="@id/toolbar"
+        android:fillViewport="true">
 
         <LinearLayout
             android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <ImageView
                 android:id="@+id/imgProduct"
@@ -51,9 +48,6 @@
                 android:padding="10dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/placeholder_image" />
-
-
-
 
             <TextView
                 android:id="@+id/txtProductName"
@@ -66,9 +60,6 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-
-
-
             <TextView
                 android:id="@+id/txtProductPrice"
                 android:layout_width="match_parent"
@@ -80,9 +71,6 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-
-
-
             <TextView
                 android:id="@+id/txtProductDescription"
                 android:layout_width="match_parent"
@@ -93,77 +81,56 @@
                 android:text="Mô tả sản phẩm..."
                 android:textSize="18sp" />
 
-
-
-
             <Button
                 android:id="@+id/btnAddToCart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:backgroundTint="#121212"
-                android:padding="10dp"
                 android:layout_marginStart="30dp"
-                android:layout_marginTop="0dp"
                 android:layout_marginEnd="30dp"
+                android:layout_marginTop="0dp"
                 android:layout_marginBottom="0dp"
+                android:padding="10dp"
+                app:backgroundTint="#121212"
                 android:text="ADD TO CART"
                 android:textColor="@android:color/white" />
+
             <RatingBar
                 android:id="@+id/ratingBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:numStars="5"
-                android:stepSize="1"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
+                android:numStars="5"
                 android:scaleX="0.7"
-                android:scaleY="0.7"/>
-
-
-
+                android:scaleY="0.7"
+                android:stepSize="1" />
 
             <EditText
                 android:id="@+id/edtReview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Your comment..."
-                android:layout_margin="20dp"/>
+                android:layout_margin="20dp"
+                android:hint="Your comment..." />
+
             <Button
                 android:id="@+id/btnSubmitReview"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:background="@color/colorPrimary"
                 android:text="Send a review"
-                android:layout_gravity="center"
-                app:backgroundTint="#000000"
-                />
+                app:backgroundTint="#000000" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewReviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="200dp"
-                android:padding="10dp"
                 android:layout_marginBottom="30dp"
-                android:nestedScrollingEnabled="false"/>
-
-
-
+                android:minHeight="200dp"
+                android:nestedScrollingEnabled="false"
+                android:padding="10dp" />
 
             <include layout="@layout/footer_component" />
         </LinearLayout>
-
-
-
-
     </androidx.core.widget.NestedScrollView>
-
-
-
-
-</FrameLayout>
-
-
-
-
-
-
+</RelativeLayout>

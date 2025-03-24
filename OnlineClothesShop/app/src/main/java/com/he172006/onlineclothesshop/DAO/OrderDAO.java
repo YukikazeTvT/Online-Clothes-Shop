@@ -128,7 +128,7 @@ public class OrderDAO {
 
     // Get possible status values for Orders (and Products)
     public List<String> getStatusValues() {
-        return Arrays.asList("Pending", "Accepted", "Declined");
+        return Arrays.asList("Pending", "Shipped", "Delivered");
     }
 
     // Convert cursor to Order object
