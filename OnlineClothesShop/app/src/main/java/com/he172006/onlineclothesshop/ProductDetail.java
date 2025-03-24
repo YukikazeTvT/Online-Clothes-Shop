@@ -29,6 +29,7 @@ import com.he172006.onlineclothesshop.entity.Product;
 import com.he172006.onlineclothesshop.entity.Review;
 import com.he172006.onlineclothesshop.adapter.ReviewAdapter;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -61,9 +62,7 @@ public class ProductDetail extends AppCompatActivity {
         // Khởi tạo Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Bỏ tiêu đề mặc định của Toolbar (vì đã có TextView tvTitle trong layout)
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        // Thêm nút quay lại trên Toolbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_revert);
 
@@ -91,7 +90,7 @@ public class ProductDetail extends AppCompatActivity {
             String name = intent.getStringExtra("product_name");
             double price = intent.getDoubleExtra("product_price", 0.0);
             String description = intent.getStringExtra("product_description");
-            String imageUrl = intent.getStringExtra("product_image");
+            String imagePath = intent.getStringExtra("product_image");
 
             DecimalFormat formatter = new DecimalFormat("#,##0");
             String formattedPrice = " $" + formatter.format(price);
@@ -100,13 +99,29 @@ public class ProductDetail extends AppCompatActivity {
             Log.d("ProductDetail", "Product Name: " + name);
             Log.d("ProductDetail", "Product Price: " + price);
             Log.d("ProductDetail", "Product Description: " + description);
-            Log.d("ProductDetail", "Product Image URL: " + imageUrl);
+            Log.d("ProductDetail", "Product Image Path: " + imagePath);
 
             txtProductName.setText(name);
             txtProductPrice.setText(formattedPrice);
             txtProductDescription.setText(description);
 
-            Glide.with(this).load(imageUrl).into(imgProduct);
+            // Hiển thị ảnh sản phẩm từ đường dẫn cục bộ
+            if (imagePath != null && !imagePath.isEmpty()) {
+                File imageFile = new File(imagePath);
+                if (imageFile.exists()) {
+                    Glide.with(this)
+                            .load(imageFile)
+                            .placeholder(R.drawable.placeholder_image)
+                            .error(R.drawable.placeholder_image)
+                            .into(imgProduct);
+                } else {
+                    Log.e("ProductDetail", "Image file does not exist: " + imagePath);
+                    imgProduct.setImageResource(R.drawable.placeholder_image);
+                }
+            } else {
+                Log.e("ProductDetail", "Image path is null or empty for Product ID: " + productId);
+                imgProduct.setImageResource(R.drawable.placeholder_image);
+            }
         }
 
         loadReviews();
@@ -179,7 +194,23 @@ public class ProductDetail extends AppCompatActivity {
                 Button btnCheckout = dialogView.findViewById(R.id.btnCheckout);
                 Button btnViewCart = dialogView.findViewById(R.id.btnViewCart);
 
-                Glide.with(this).load(product.getImage()).into(dialogImage);
+                // Hiển thị ảnh trong dialog
+                String imagePath = product.getImage();
+                if (imagePath != null && !imagePath.isEmpty()) {
+                    File imageFile = new File(imagePath);
+                    if (imageFile.exists()) {
+                        Glide.with(this)
+                                .load(imageFile)
+                                .placeholder(R.drawable.placeholder_image)
+                                .error(R.drawable.placeholder_image)
+                                .into(dialogImage);
+                    } else {
+                        dialogImage.setImageResource(R.drawable.placeholder_image);
+                    }
+                } else {
+                    dialogImage.setImageResource(R.drawable.placeholder_image);
+                }
+
                 dialogTitle.setText(product.getProductName());
                 dialogPrice.setText("USD$" + product.getPrice());
                 dialogQuantity.setText("Quantity: 1");
@@ -259,7 +290,6 @@ public class ProductDetail extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
-            // Xử lý nút quay lại trên Toolbar
             finish();
             return true;
         } else if (itemId == R.id.menu_logout) {
@@ -281,11 +311,10 @@ public class ProductDetail extends AppCompatActivity {
         } else if (itemId == R.id.menu_cart) {
             startActivity(new Intent(this, ShoppingCartActivity.class));
             return true;
-        }
-        else if (itemId == R.id.menu_search) {
+        } else if (itemId == R.id.menu_search) {
             startActivity(new Intent(this, SearchProductActivity.class));
             return true;
-        }else if (itemId == R.id.menu_orders) {
+        } else if (itemId == R.id.menu_orders) {
             if (sessionManager.isLoggedIn()) {
                 startActivity(new Intent(this, OrderHistoryActivity.class));
             } else {

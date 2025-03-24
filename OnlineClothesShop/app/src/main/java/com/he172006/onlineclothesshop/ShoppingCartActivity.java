@@ -44,6 +44,10 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
         // Set up Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false); // Ẩn tiêu đề mặc định
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Thêm nút quay lại
+        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_revert); // Icon nút quay lại
+
         TextView tvTitle = toolbar.findViewById(R.id.tvTitle);
         if (tvTitle != null) {
             tvTitle.setText("SHOPPING BAG");
@@ -127,9 +131,10 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        // Ẩn các mục menu không cần thiết
         menu.findItem(R.id.menu_search).setVisible(false);
         menu.findItem(R.id.menu_sort).setVisible(false);
-        menu.findItem(R.id.menu_cart).setVisible(false);
+        menu.findItem(R.id.menu_cart).setVisible(false); // Ẩn mục "Cart" vì đang ở ShoppingCartActivity
         return true;
     }
 
@@ -137,7 +142,11 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.menu_logout) {
+        if (itemId == android.R.id.home) {
+            // Xử lý nút quay lại trên Toolbar
+            finish();
+            return true;
+        } else if (itemId == R.id.menu_logout) {
             if (sessionManager.isLoggedIn()) {
                 sessionManager.logout();
                 Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
@@ -151,8 +160,9 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
             return true;
         } else if (itemId == R.id.menu_home) {
             startActivity(new Intent(this, HomeActivity.class));
+            finish();
             return true;
-        }else if (itemId == R.id.menu_orders) {
+        } else if (itemId == R.id.menu_orders) {
             if (sessionManager.isLoggedIn()) {
                 startActivity(new Intent(this, OrderHistoryActivity.class));
             } else {
@@ -161,7 +171,7 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
             }
             return true;
         }
-//        else if (itemId == R.id.menu_categories) {
+        //        else if (itemId == R.id.menu_categories) {
 //            startActivity(new Intent(this, CategoriesActivity.class));
 //            return true;
 //        }
@@ -178,6 +188,7 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
 //            }
 //            return true;
 //        }
-       return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 }
+
