@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 
+import com.bumptech.glide.Glide;
 import com.he172006.onlineclothesshop.DAO.BannerDAO;
 import com.he172006.onlineclothesshop.DAO.CategoryDAO;
 import com.he172006.onlineclothesshop.DAO.ProductDAO;
@@ -34,6 +35,7 @@ import com.he172006.onlineclothesshop.entity.Category;
 import com.he172006.onlineclothesshop.entity.Product;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -198,6 +200,8 @@ public class HomeActivity extends AppCompatActivity {
                     Intent intent = new Intent(HomeActivity.this, ListProductByCategory.class);
                     intent.putExtra("categoryId", category.getCategoryId());
                     intent.putExtra("categoryName", category.getCategoryName());
+                    String imagePath = intent.getStringExtra("product_image");
+
                     startActivity(intent);
                 });
 
