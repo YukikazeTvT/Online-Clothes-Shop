@@ -170,6 +170,14 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
                 startActivity(new Intent(this, LoginActivity.class));
             }
             return true;
+        }  else if (itemId == R.id.menu_user_profile) {
+            if (sessionManager.isLoggedIn()) {
+                startActivity(new Intent(this, ProfileActivity.class));
+            } else {
+                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+            }
+            return true;
         }
         //        else if (itemId == R.id.menu_categories) {
 //            startActivity(new Intent(this, CategoriesActivity.class));
@@ -179,15 +187,7 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
 //
 //            return true;
 //        }
-//        else if (itemId == R.id.menu_user_profile) {
-//            if (sessionManager.isLoggedIn()) {
-//                startActivity(new Intent(this, ProfileActivity.class));
-//            } else {
-//                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, LoginActivity.class));
-//            }
-//            return true;
-//        }
+
         return super.onOptionsItemSelected(item);
     }
 }

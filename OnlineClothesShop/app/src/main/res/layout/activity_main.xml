@@ -25,34 +25,6 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"/>
-
-        <!-- Icons (Cart, Profile, Search, Menu) -->
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_add"
-            android:contentDescription="Cart"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_manage"
-            android:contentDescription="Profile"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_search"
-            android:contentDescription="Search"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_more"
-            android:contentDescription="Menu"/>
     </LinearLayout>
 
     <!-- Welcome Message -->
@@ -115,8 +87,8 @@
     <!-- Skip Link -->
     <TextView
         android:id="@+id/tvSkip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="Skip"
         android:textSize="14sp"
         android:textColor="@android:color/black"

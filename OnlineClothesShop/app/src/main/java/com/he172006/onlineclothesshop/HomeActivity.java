@@ -242,15 +242,15 @@ public class HomeActivity extends AppCompatActivity {
             }
             return true;
         }
-//        else if (itemId == R.id.menu_user_profile) {
-//            if (sessionManager.isLoggedIn()) {
-//                startActivity(new Intent(this, ProfileActivity.class));
-//            } else {
-//                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, LoginActivity.class));
-//            }
-//            return true;
-//        }
+        else if (itemId == R.id.menu_user_profile) {
+            if (sessionManager.isLoggedIn()) {
+                startActivity(new Intent(this, ProfileActivity.class));
+            } else {
+                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+            }
+            return true;
+        }
         else if (itemId == R.id.menu_sort) {
             // Gọi hàm showSortMenu để hiển thị menu sort hiện có
             showSortMenu(findViewById(R.id.toolbar));
