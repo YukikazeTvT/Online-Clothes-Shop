@@ -152,6 +152,14 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
         } else if (itemId == R.id.menu_home) {
             startActivity(new Intent(this, HomeActivity.class));
             return true;
+        }else if (itemId == R.id.menu_orders) {
+            if (sessionManager.isLoggedIn()) {
+                startActivity(new Intent(this, OrderHistoryActivity.class));
+            } else {
+                Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+            }
+            return true;
         }
 //        else if (itemId == R.id.menu_categories) {
 //            startActivity(new Intent(this, CategoriesActivity.class));

@@ -285,6 +285,14 @@ public class ProductDetail extends AppCompatActivity {
         else if (itemId == R.id.menu_search) {
             startActivity(new Intent(this, SearchProductActivity.class));
             return true;
+        }else if (itemId == R.id.menu_orders) {
+            if (sessionManager.isLoggedIn()) {
+                startActivity(new Intent(this, OrderHistoryActivity.class));
+            } else {
+                Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

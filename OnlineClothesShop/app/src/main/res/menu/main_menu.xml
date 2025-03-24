@@ -30,7 +30,11 @@
         android:title="Cart"
         android:icon="@android:drawable/ic_menu_add"
         app:showAsAction="ifRoom" />
-
+    <item
+        android:id="@+id/menu_orders"
+        android:title="Orders"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="ifRoom" />
 
 
     <item

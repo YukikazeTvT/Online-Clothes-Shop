@@ -2,11 +2,9 @@ package com.he172006.onlineclothesshop;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,95 +12,93 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.he172006.onlineclothesshop.DAO.OrderDAO;
+import com.he172006.onlineclothesshop.DAO.OrderDetailDAO;
 import com.he172006.onlineclothesshop.DAO.ProductDAO;
-import com.he172006.onlineclothesshop.adapter.SearchProductAdapter;
-import com.he172006.onlineclothesshop.entity.Product;
+import com.he172006.onlineclothesshop.adapter.OrderDetailAdapter;
+import com.he172006.onlineclothesshop.entity.Order;
+import com.he172006.onlineclothesshop.entity.OrderDetail;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SearchProductActivity extends AppCompatActivity {
+public class OrderDetailActivity extends AppCompatActivity {
 
-    private EditText searchInput;
-    private RecyclerView searchResultsRecyclerView;
-    private SearchProductAdapter searchAdapter;
-    private List<Product> allProducts = new ArrayList<>();
-    private List<Product> filteredProducts = new ArrayList<>();
+    private TextView txtOrderId, txtOrderDate, txtTotalAmount, txtStatus;
+    private RecyclerView recyclerViewOrderDetails;
+    private OrderDetailAdapter orderDetailAdapter;
+    private List<OrderDetail> orderDetailList = new ArrayList<>();
+    private OrderDAO orderDAO;
+    private OrderDetailDAO orderDetailDAO;
     private ProductDAO productDAO;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private Session sessionManager;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_product);
+        setContentView(R.layout.activity_order_detail);
 
         // Khởi tạo Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Bỏ tiêu đề mặc định của Toolbar (vì đã có TextView tvTitle trong layout)
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        // Thêm nút quay lại trên Toolbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_revert);
 
         // Initialize SessionManager
         sessionManager = new Session(this);
 
-        // Initialize views
-        searchInput = findViewById(R.id.searchInput);
-        searchResultsRecyclerView = findViewById(R.id.searchResultsRecyclerView);
-        searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Initialize DAO
+        // Initialize DAOs
+        orderDAO = new OrderDAO(this);
+        orderDetailDAO = new OrderDetailDAO(this);
         productDAO = new ProductDAO(this);
 
-        // Load all products
-        loadProducts();
+        // Initialize views
+        txtOrderId = findViewById(R.id.txtOrderId);
+        txtOrderDate = findViewById(R.id.txtOrderDate);
+        txtTotalAmount = findViewById(R.id.txtTotalAmount);
+        txtStatus = findViewById(R.id.txtStatus);
+        recyclerViewOrderDetails = findViewById(R.id.recyclerViewOrderDetails);
+        recyclerViewOrderDetails.setLayoutManager(new LinearLayoutManager(this));
+        orderDetailAdapter = new OrderDetailAdapter(this, orderDetailList, productDAO);
+        recyclerViewOrderDetails.setAdapter(orderDetailAdapter);
 
-        // Setup TextWatcher for search input
-        searchInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterProducts(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
+        // Load order details
+        loadOrderDetails();
     }
 
-    private void loadProducts() {
+    private void loadOrderDetails() {
+        int orderId = getIntent().getIntExtra("orderId", -1);
+        if (orderId == -1) {
+            Toast.makeText(this, "Invalid order ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         executor.execute(() -> {
-            allProducts = productDAO.getAllProducts();
-            filteredProducts.addAll(allProducts);
+            Order order = orderDAO.getOrderById(orderId);
+            List<OrderDetail> details = orderDetailDAO.getOrderDetailsByOrderId(orderId);
             runOnUiThread(() -> {
-                searchAdapter = new SearchProductAdapter(SearchProductActivity.this, filteredProducts);
-                searchResultsRecyclerView.setAdapter(searchAdapter);
+                if (order != null) {
+                    txtOrderId.setText("Order #" + order.getOrderId());
+                    txtOrderDate.setText("Order Date: " + order.getOrderDate());
+                    DecimalFormat formatter = new DecimalFormat("#,##0.00");
+                    txtTotalAmount.setText("Total: USD$" + formatter.format(order.getTotalAmount()));
+                    txtStatus.setText("Status: " + order.getStatus());
+                } else {
+                    Toast.makeText(this, "Order not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                orderDetailList.clear();
+                orderDetailList.addAll(details);
+                orderDetailAdapter.notifyDataSetChanged();
             });
         });
-    }
-
-    private void filterProducts(String query) {
-        filteredProducts.clear();
-        if (query.isEmpty()) {
-            filteredProducts.addAll(allProducts);
-        } else {
-            for (Product product : allProducts) {
-                if (product.getProductName().toLowerCase().contains(query.toLowerCase()) ||
-                        product.getDescription().toLowerCase().contains(query.toLowerCase())) {
-                    filteredProducts.add(product);
-                }
-            }
-        }
-        if (searchAdapter != null) {
-            searchAdapter.updateProducts(filteredProducts);
-        }
     }
 
     @Override
@@ -115,7 +111,6 @@ public class SearchProductActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
-            // Xử lý nút quay lại trên Toolbar
             finish();
             return true;
         } else if (itemId == R.id.menu_logout) {
@@ -137,7 +132,7 @@ public class SearchProductActivity extends AppCompatActivity {
         } else if (itemId == R.id.menu_cart) {
             startActivity(new Intent(this, ShoppingCartActivity.class));
             return true;
-        }else if (itemId == R.id.menu_orders) {
+        } else if (itemId == R.id.menu_orders) {
             if (sessionManager.isLoggedIn()) {
                 startActivity(new Intent(this, OrderHistoryActivity.class));
             } else {
@@ -152,6 +147,12 @@ public class SearchProductActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (orderDAO != null) {
+            orderDAO.close();
+        }
+        if (orderDetailDAO != null) {
+            orderDetailDAO.close();
+        }
         if (productDAO != null) {
             productDAO.close();
         }
