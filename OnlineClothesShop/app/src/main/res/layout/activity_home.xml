@@ -21,12 +21,14 @@
             android:text="GUCIT"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            />
 
     </androidx.appcompat.widget.Toolbar>
 
     <!-- Nội dung có thể cuộn -->
     <androidx.core.widget.NestedScrollView
+
         android:id="@+id/homeContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -76,7 +78,7 @@
                 android:nestedScrollingEnabled="false"
                 android:orientation="vertical" />
 
-            <include layout="@layout/footer_component" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -84,6 +86,7 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="?attr/actionBarSize"/>
+        android:paddingTop="?attr/actionBarSize"
+    />
 
 </FrameLayout>

@@ -13,9 +13,11 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.he172006.onlineclothesshop.DAO.CartDAO;
 import com.he172006.onlineclothesshop.DAO.OrderDAO;
+import com.he172006.onlineclothesshop.DAO.OrderDetailDAO;
 import com.he172006.onlineclothesshop.DAO.ProductDAO;
 import com.he172006.onlineclothesshop.entity.Cart;
 import com.he172006.onlineclothesshop.entity.Order;
+import com.he172006.onlineclothesshop.entity.OrderDetail;
 import com.he172006.onlineclothesshop.entity.Product;
 
 import java.text.DecimalFormat;
@@ -30,6 +32,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private CartDAO cartDAO;
     private ProductDAO productDAO;
     private OrderDAO orderDAO;
+    private OrderDetailDAO orderDetailDAO; // Thêm OrderDetailDAO
     private ArrayList<Cart> cartItems;
     private double totalPrice;
     private Session sessionManager;
@@ -50,9 +53,11 @@ public class CheckoutActivity extends AppCompatActivity {
             tvTitle.setText("CHECKOUT");
         }
 
+        // Khởi tạo các DAO
         cartDAO = new CartDAO(this);
         productDAO = new ProductDAO(this);
         orderDAO = new OrderDAO(this);
+        orderDetailDAO = new OrderDetailDAO(this); // Khởi tạo OrderDetailDAO
 
         txtSubtotal = findViewById(R.id.txtSubtotal);
         txtShipping = findViewById(R.id.txtShipping);
@@ -128,10 +133,27 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        // Giảm số lượng tồn kho và xóa giỏ hàng
+        // Lưu chi tiết đơn hàng vào bảng OrderDetails
         for (Cart cart : cartItems) {
             Product product = productDAO.getProductById(cart.getProductId());
             if (product != null) {
+                // Tính subtotal cho sản phẩm này
+                double subtotal = product.getPrice() * cart.getQuantity();
+
+                // Tạo bản ghi OrderDetail
+                OrderDetail orderDetail = new OrderDetail();
+                orderDetail.setOrderId((int) orderId);
+                orderDetail.setProductId(cart.getProductId());
+                orderDetail.setQuantity(cart.getQuantity());
+                orderDetail.setSubtotal(subtotal);
+
+                // Lưu vào bảng OrderDetails
+                long orderDetailId = orderDetailDAO.insertOrderDetail(orderDetail);
+                if (orderDetailId == -1) {
+                    Toast.makeText(this, "Failed to save order details for product ID: " + cart.getProductId(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Giảm số lượng tồn kho
                 product.setStock(product.getStock() - cart.getQuantity());
                 productDAO.updateProduct(product);
@@ -158,14 +180,18 @@ public class CheckoutActivity extends AppCompatActivity {
         if (orderDAO != null) {
             orderDAO.close();
         }
+        if (orderDetailDAO != null) {
+            orderDetailDAO.close();
+        }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.menu_sort).setVisible(false);
         return true;
     }
 
-    // Xử lý sự kiện khi chọn item trong menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
@@ -182,14 +208,10 @@ public class CheckoutActivity extends AppCompatActivity {
             }
             return true;
         } else if (itemId == R.id.menu_home) {
-            // Đã ở HomeActivity, không cần làm gì
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
             return true;
-        }
-//        else if (itemId == R.id.menu_categories) {
-//            startActivity(new Intent(this, CategoriesActivity.class));
-//            return true;
-//        }
-        else if (itemId == R.id.menu_cart) {
+        } else if (itemId == R.id.menu_cart) {
             startActivity(new Intent(this, ShoppingCartActivity.class));
             return true;
         }
@@ -202,15 +224,16 @@ public class CheckoutActivity extends AppCompatActivity {
 //            }
 //            return true;
 //        }
-//        else if (itemId == R.id.menu_user_profile) {
-//            if (sessionManager.isLoggedIn()) {
-//                startActivity(new Intent(this, ProfileActivity.class));
-//            } else {
-//                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, LoginActivity.class));
-//            }
-//            return true;
-//        }
+        else if (itemId == R.id.menu_user_profile) {
+            if (sessionManager.isLoggedIn()) {
+                Toast.makeText(this, "User Profile clicked", Toast.LENGTH_SHORT).show();
+                // TODO: Start ProfileActivity if exists
+            } else {
+                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, LoginActivity.class));
+            }
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

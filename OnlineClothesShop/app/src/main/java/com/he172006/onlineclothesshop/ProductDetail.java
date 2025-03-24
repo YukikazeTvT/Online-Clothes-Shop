@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,6 +57,15 @@ public class ProductDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_product_detail);
+
+        // Khởi tạo Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Bỏ tiêu đề mặc định của Toolbar (vì đã có TextView tvTitle trong layout)
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        // Thêm nút quay lại trên Toolbar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_revert);
 
         // Initialize SessionManager
         sessionManager = new Session(this);
@@ -237,17 +247,22 @@ public class ProductDetail extends AppCompatActivity {
             });
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.menu_sort).setVisible(false);
         return true;
     }
 
-    // Xử lý sự kiện khi chọn item trong menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.menu_logout) {
+        if (itemId == android.R.id.home) {
+            // Xử lý nút quay lại trên Toolbar
+            finish();
+            return true;
+        } else if (itemId == R.id.menu_logout) {
             if (sessionManager.isLoggedIn()) {
                 sessionManager.logout();
                 Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
@@ -260,35 +275,29 @@ public class ProductDetail extends AppCompatActivity {
             }
             return true;
         } else if (itemId == R.id.menu_home) {
-            // Đã ở HomeActivity, không cần làm gì
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
             return true;
-        }
-//        else if (itemId == R.id.menu_categories) {
-//            startActivity(new Intent(this, CategoriesActivity.class));
-//            return true;
-//        }
-        else if (itemId == R.id.menu_cart) {
+        } else if (itemId == R.id.menu_cart) {
             startActivity(new Intent(this, ShoppingCartActivity.class));
             return true;
         }
-//        else if (itemId == R.id.menu_orders) {
-//            if (sessionManager.isLoggedIn()) {
-//                startActivity(new Intent(this, OrderListActivity.class));
-//            } else {
-//                Toast.makeText(this, "Please log in to view your orders", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, LoginActivity.class));
-//            }
-//            return true;
-//        }
-//        else if (itemId == R.id.menu_user_profile) {
-//            if (sessionManager.isLoggedIn()) {
-//                startActivity(new Intent(this, ProfileActivity.class));
-//            } else {
-//                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, LoginActivity.class));
-//            }
-//            return true;
-//        }
+        else if (itemId == R.id.menu_search) {
+            startActivity(new Intent(this, SearchProductActivity.class));
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (productDAO != null) {
+            productDAO.close();
+        }
+        if (cartDAO != null) {
+            cartDAO.close();
+        }
+        executor.shutdown();
     }
 }

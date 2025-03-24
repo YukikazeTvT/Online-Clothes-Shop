@@ -127,6 +127,9 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.menu_search).setVisible(false);
+        menu.findItem(R.id.menu_sort).setVisible(false);
+        menu.findItem(R.id.menu_cart).setVisible(false);
         return true;
     }
 
@@ -154,10 +157,10 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
 //            startActivity(new Intent(this, CategoriesActivity.class));
 //            return true;
 //        }
-        else if (itemId == R.id.menu_cart) {
-            // Đã ở ShoppingCartActivity, không cần làm gì
-            return true;
-        }
+//        else if (itemId == R.id.menu_cart) {
+//
+//            return true;
+//        }
 //        else if (itemId == R.id.menu_user_profile) {
 //            if (sessionManager.isLoggedIn()) {
 //                startActivity(new Intent(this, ProfileActivity.class));
@@ -165,10 +168,6 @@ public class ShoppingCartActivity extends AppCompatActivity implements CartAdapt
 //                Toast.makeText(this, "Please log in to view your profile", Toast.LENGTH_SHORT).show();
 //                startActivity(new Intent(this, LoginActivity.class));
 //            }
-//            return true;
-//        } else if (itemId == R.id.menu_sort) {
-//            // ShoppingCartActivity không cần sort, có thể bỏ qua hoặc hiển thị thông báo
-//            Toast.makeText(this, "Sort is not available in Cart", Toast.LENGTH_SHORT).show();
 //            return true;
 //        }
        return super.onOptionsItemSelected(item);

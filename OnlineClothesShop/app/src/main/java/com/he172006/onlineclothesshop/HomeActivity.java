@@ -224,12 +224,13 @@ public class HomeActivity extends AppCompatActivity {
             // Đã ở HomeActivity, không cần làm gì
             return true;
         }
-//        else if (itemId == R.id.menu_categories) {
-//            startActivity(new Intent(this, CategoriesActivity.class));
-//            return true;
-//        }
+
         else if (itemId == R.id.menu_cart) {
             startActivity(new Intent(this, ShoppingCartActivity.class));
+            return true;
+        }
+        else if (itemId == R.id.menu_search) {
+            startActivity(new Intent(this, SearchProductActivity.class));
             return true;
         }
 //        else if (itemId == R.id.menu_orders) {

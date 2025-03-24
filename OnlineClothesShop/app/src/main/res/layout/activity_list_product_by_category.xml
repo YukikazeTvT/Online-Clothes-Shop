@@ -62,7 +62,7 @@
 
 
 
-            <include layout="@layout/footer_component" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
