@@ -1,6 +1,7 @@
 package com.he172006.onlineclothesshop.adapter;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,10 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import  com.squareup.picasso.Picasso;
 import com.he172006.onlineclothesshop.R;
 import com.he172006.onlineclothesshop.entity.Category;
-
+import java.io.File;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
     private List<Category> categoryList;
     private OnItemClickListener listener;
+
 
 
     public interface OnItemClickListener {
@@ -50,12 +54,17 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         holder.categoryName.setText(category.getCategoryName());
 
 
-        if (category.getImage() == null || category.getImage().isEmpty()) {
-            holder.categoryImage.setImageResource(R.drawable.placeholder_image);
-        } else {
-            Picasso.get().load(category.getImage()).into(holder.categoryImage);
-        }
 
+        File imageFile = new File(category.getImage());
+        if (imageFile.exists()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(imageFile)
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.placeholder_image)
+                    .into(holder.categoryImage);
+        } else {
+            holder.categoryImage.setImageResource(R.drawable.placeholder_image);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
@@ -80,6 +89,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             super(itemView);
             categoryName = itemView.findViewById(R.id.categoryName);
             categoryImage = itemView.findViewById(R.id.categoryImage);
+
         }
     }
 }
